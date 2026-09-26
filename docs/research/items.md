@@ -43,3 +43,7 @@ behavior and the entire strings archive byte-for-byte, updates sprite offsets,
 lengths and checksums, and zero-fills unused archive space. Unselected frame
 payloads remain unchanged. No new category, price, name or behavior is synthesized.
 The 16,384-byte item limit is enforced; patch-sized output is excluded.
+
+`舞台.bin` is a user-reported accepted reference from Patchi Lab V1. It is kept
+as the original workspace file and is not treated as proof that rebuilt output
+will be accepted.

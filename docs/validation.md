@@ -14,6 +14,9 @@
   overlapping frame offsets, RLE bounds, partial alpha and unsupported formats.
 - No UART writes or generated-resource hardware tests were performed. All binary
   output remains EXPERIMENTAL. A protocol key and validated transfer flow are missing.
+- User-provided `舞台.bin` was previously accepted by Patchi Lab V1. This records
+  source provenance only; TamaLab did not perform that upload and has not uploaded
+  a rebuilt file.
 
 The following section records the earlier foundation validation.
 

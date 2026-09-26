@@ -26,6 +26,17 @@ item transfer capture. Preparing/exporting binary data must not enable UART writ
 The documented item download limit is 0x4000 bytes; larger downloads are patches,
 which remain excluded. A checksum-valid archive does not prove item semantics.
 
+## User-provided accepted reference
+
+`舞台.bin` is present in the project workspace. SHA-256:
+`85e726a6acadb6972d502a6f95f42c0ca2d59dbc0b04d8a29234a09a5000db87`.
+The user reports that this exact file was successfully uploaded by Patchi Lab V1.
+TamaLab parses it as a 16,384-byte ARC2 archive with three files and six indexed
+sprite entries (nine frames total). This is strong evidence that the container is
+accepted by at least the user's device/toolchain, but it does not identify the
+transfer encryption key, prove every field's semantics, or prove that a modified
+file will be accepted. The original file remains unmodified in the workspace.
+
 ## Corrections
 
 - Sprite headers are **24 bytes**, not the 20 bytes in the previous notes.

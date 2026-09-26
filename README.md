@@ -81,7 +81,7 @@ The one-shot echo waits 500 ms and does not retry automatically.
 
 ## Known Issues
 
-- Physical device testing has not happened. No resource is Device Verified.
+- One real-device ECHO connectivity test passed on 2026-09-26; see [hardware test log](docs/hardware-tests.md). No resource is Device Verified.
 - Paradise item/sprite encoding and resource transfer are unavailable. No generated
   device binary can be exported; only the preview PNG and UART logs can be exported.
 - PCOM transport behavior is UNKNOWN for the user's specific adapter.
@@ -110,16 +110,17 @@ IndexedDB restoration, and settings. Hardware stream tests use synthetic streams
 
 ## Hardware Tests
 
-**NOT RUN.** See [hardware test log](docs/hardware-tests.md). Browser tests and
-simulated serial streams must never be reported as real-device verification.
+One ECHO connectivity test is recorded as PASS. Resource transfer remains NOT
+RUN. See [hardware test log](docs/hardware-tests.md). Browser tests and simulated
+serial streams must never be reported as real-device verification.
 
 ## Next Tasks
 
 1. Review this architecture and UART foundation (the Project.md stop point).
-2. Identify the user's adapter and test the documented echo on real hardware.
-3. Record TX/RX and device behavior with adapter/browser/OS details.
-4. Pin upstream research revisions and acquire provenance-backed sprite/item fixtures.
-5. Only after review, implement verified binary formats with malformed-input tests.
+2. Export the raw TX/RX JSON from the successful ECHO test and record adapter/browser details.
+3. Pin upstream research revisions and acquire provenance-backed sprite/item fixtures.
+4. Implement the documented sprite encoder behind tests, without claiming item compatibility.
+5. Identify and validate the item container before enabling any device transfer.
 
 ## Research sources
 

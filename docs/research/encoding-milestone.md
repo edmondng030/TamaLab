@@ -21,8 +21,11 @@ item names, categories, prices, or interaction fields are invented. In-app name
 and category remain editor metadata. Encoded/rebuilt output is EXPERIMENTAL.
 
 The download protocol specifies a shared encryption key. ECHO is plaintext and
-does not supply that key. This project has no verified key and no real custom
-item transfer capture. Preparing/exporting binary data must not enable UART writes.
+does not supply that key. Subsequent inspection of the user's Patchi Lab V1
+installation identified its key and unchanged download flow. See
+[item-upload.md](item-upload.md). Offline preparation/export does not send bytes;
+the separate device uploader requires explicit selection and a local key import.
+TamaLab's real custom-item transfer capture remains outstanding.
 The documented item download limit is 0x4000 bytes; larger downloads are patches,
 which remain excluded. A checksum-valid archive does not prove item semantics.
 

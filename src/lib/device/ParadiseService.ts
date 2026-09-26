@@ -1,6 +1,8 @@
 import type { Transport, Unsubscribe } from "@/lib/transport/Transport";
 import { ParadiseProtocol } from "@/lib/paradise/protocol/protocol";
 import { logEntry, type LogEntry } from "./log";
+import type { UploadOptions } from "@/lib/paradise/protocol/item-upload";
+import { parseProtocolKey } from "@/lib/paradise/protocol/item-packet";
 import {
   ParadiseSpriteEncoder,
   type SpriteResource,
@@ -11,6 +13,7 @@ import {
   rebuildItemTemplate,
 } from "@/lib/paradise/item/template";
 export class ParadiseService {
+  static parseProtocolKey = parseProtocolKey;
   static inspectItem = inspectItemTemplate;
   static async prepareSprite(resource: SpriteResource) {
     const bytes = await new ParadiseSpriteEncoder().encode(resource);
@@ -66,6 +69,9 @@ export class ParadiseService {
   }
   sendTest() {
     return this.protocol.echo();
+  }
+  sendItem(bytes: Uint8Array, key: Uint8Array, options: UploadOptions) {
+    return this.protocol.sendItem(bytes, key, options);
   }
   async dispose() {
     this.subscriptions.forEach((off) => off());

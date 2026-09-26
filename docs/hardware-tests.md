@@ -42,6 +42,14 @@ protocol key or item-transfer evidence.
 
 ## Test record template
 
+Next test: TamaLab unchanged upload of `舞台.bin` (16,384 bytes, SHA-256
+`85e726a6acadb6972d502a6f95f42c0ca2d59dbc0b04d8a29234a09a5000db87`).
+Status: **NOT RUN on hardware**. The user reports prior new-item acceptance through
+Patchi Lab V1. Static inspection identified that application's type-3 download
+flow and local key. A TamaLab mock transfer with that key reconstructed the original
+file byte-for-byte; that is software validation only. Record device screen/result,
+adapter/settings, capture, and whether existing items remain available.
+
 | Field                              | Value   |
 | ---------------------------------- | ------- |
 | Date / time / timezone             | UNKNOWN |
@@ -62,4 +70,5 @@ protocol key or item-transfer evidence.
 For the next test, choose USB serial in `/device`, start capture,
 connect the port, place the device in its connection flow, and run one ECHO test.
 Stop and export capture. Record even failures; do not infer compatibility from
-an open serial port. No resource upload is available in this release.
+an open serial port. An experimental existing-item uploader is now available;
+its result must be recorded separately from echo connectivity.

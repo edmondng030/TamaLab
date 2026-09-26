@@ -22,6 +22,11 @@ interface DeviceState {
   capture: LogEntry[];
   capturing: boolean;
   captureFull: boolean;
+  uploadProgress: number;
+  uploadTotal: number;
+  uploading: boolean;
+  sendItem: (bytes: Uint8Array, key: Uint8Array) => Promise<void>;
+  cancelUpload: () => void;
   connect: (
     mode: "mock" | "serial",
     baudRate: number,
@@ -34,6 +39,7 @@ interface DeviceState {
   stopCapture: () => void;
 }
 let service: ParadiseService | undefined;
+let uploadAbort: AbortController | undefined;
 const describe = (error: unknown) =>
   error instanceof Error
     ? error.message
@@ -50,6 +56,53 @@ export const useDevice = create<DeviceState>((set, get) => ({
   capture: [],
   capturing: false,
   captureFull: false,
+  uploadProgress: 0,
+  uploadTotal: 0,
+  uploading: false,
+  cancelUpload: () => uploadAbort?.abort(),
+  sendItem: async (bytes, key) => {
+    if (get().busy || get().status !== "connected" || !service) return;
+    if (
+      get().mode === "serial" &&
+      get().baudRate !== DEFAULT_SERIAL_CONFIG.baudRate
+    ) {
+      set({ message: "Reconnect at 460800 baud before uploading." });
+      return;
+    }
+    const active = service;
+    uploadAbort = new AbortController();
+    set({
+      busy: true,
+      uploading: true,
+      uploadProgress: 0,
+      uploadTotal: bytes.length,
+      message: "Sending the selected item unchanged…",
+    });
+    try {
+      await active.sendItem(bytes, key, {
+        signal: uploadAbort.signal,
+        onProgress: (uploadProgress, uploadTotal) =>
+          set({ uploadProgress, uploadTotal }),
+      });
+      set({
+        message:
+          get().mode === "mock"
+            ? "Mock upload completed. No hardware was tested."
+            : "All item chunks acknowledged. Check the Tamagotchi screen to confirm the item was added.",
+      });
+    } catch (error) {
+      try {
+        await active.dispose();
+      } catch {
+        /* Keep original upload error. */
+      }
+      if (service === active) service = undefined;
+      set({ status: "disconnected", info: {}, message: describe(error) });
+    } finally {
+      uploadAbort = undefined;
+      set({ busy: false, uploading: false });
+    }
+  },
   connect: async (mode, baudRate, behavior) => {
     if (get().status !== "disconnected") return;
     set({

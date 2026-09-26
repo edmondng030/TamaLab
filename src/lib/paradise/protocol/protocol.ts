@@ -1,18 +1,32 @@
 import type { Transport } from "@/lib/transport/Transport";
 import { ECHO_TIMEOUT_MS } from "../config";
 import { echoRequest, ECHO_REPLY } from "./commands";
+import { uploadItem, type UploadOptions } from "./item-upload";
 
-// Only the documented ASCII echo is implemented. No resource packets are encoded.
+// One operation owns the serial stream at a time.
 export class ParadiseProtocol {
   private pending = false;
   constructor(
     private transport: Transport,
     private onTransmit: (data: Uint8Array) => void = () => {},
   ) {}
+  async sendItem(
+    data: Uint8Array,
+    key: Uint8Array,
+    options: UploadOptions = {},
+  ) {
+    if (this.pending) throw new Error("A device operation is already running.");
+    this.pending = true;
+    try {
+      await uploadItem(this.transport, data, key, this.onTransmit, options);
+    } finally {
+      this.pending = false;
+    }
+  }
   async echo(timeoutMs = ECHO_TIMEOUT_MS): Promise<void> {
     if (!this.transport.isConnected())
       throw new Error("Connect a device before running the echo test.");
-    if (this.pending) throw new Error("An echo test is already running.");
+    if (this.pending) throw new Error("A device operation is already running.");
     this.pending = true;
     try {
       await new Promise<void>((resolve, reject) => {

@@ -14,8 +14,8 @@ export default function SettingsPage() {
       <section className="panel settings-panel">
         <h2>Developer Mode</h2>
         <p>
-          Enable manual baud rate configuration in the Device lab. Protocol
-          writing and unverified binary exports remain unavailable.
+          Enable manual baud rate configuration in the Device lab. Existing-item
+          uploads require 460800 baud and a locally imported protocol key.
         </p>
         <label className="toggle-label">
           <input

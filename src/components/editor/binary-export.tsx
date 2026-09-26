@@ -251,9 +251,8 @@ export function BinaryExport({ image }: { image?: Blob }) {
         </>
       )}
       <p className="field-help">
-        Device transfer is unavailable: a verified protocol key and
-        hardware-tested transfer flow are still needed. An echo reply confirms
-        connectivity only.
+        Exported files can be selected in Device lab’s existing-item uploader.
+        Generated output remains experimental until checked on the device.
       </p>
     </section>
   );

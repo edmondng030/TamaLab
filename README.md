@@ -4,7 +4,8 @@ A local sprite workspace and UART research lab for Tamagotchi Paradise.
 
 ## Current Version
 
-**Initial foundation plus experimental offline binary export.** This is not the completed device-transfer MVP.
+**Initial foundation, offline binary export, and experimental existing-item upload.**
+TamaLab's physical upload test remains pending.
 The app lives at this repository's root; source code uses `src/` consistently.
 
 ## Run locally
@@ -35,6 +36,9 @@ installation. The installed CLI works directly:
 - Stream capture, stop, and JSON/TXT export. The visible log retains 1,000 chunks;
   capture stops at 10,000 chunks. Start Capture replaces the preceding capture.
 - Mock success, synthetic error, and timeout modes. Mock mode is the default.
+- `/device`: unchanged ARC2 item upload (maximum 16,384 bytes), local protocol-key
+  import, acknowledged-byte progress, bounded retries, cancellation and TX/RX capture.
+  Uses the download flow inspected in the user's Patchi Lab V1 installation.
 - `/studio`: PNG/JPG/WEBP import (10 MB max), drag/drop, clipboard paste within
   the workspace, source-pixel crop with outline, nearest-neighbor resizing,
   median-cut palettes (2/4/16/256), transparent canvas preview, and 1–16× zoom.
@@ -57,7 +61,7 @@ The mock adapter does not establish hardware or resource compatibility.
 
 ```text
 React UI → Zustand device controller → ParadiseService
-                                      → ParadiseProtocol (echo only)
+                                      → ParadiseProtocol (echo / type-3 item upload)
                                       → Transport
                                         ├─ WebSerialTransport
                                         ├─ MockTransport
@@ -86,8 +90,9 @@ The one-shot echo waits 500 ms and does not retry automatically.
 ## Known Issues
 
 - One real-device ECHO connectivity test passed on 2026-09-26; see [hardware test log](docs/hardware-tests.md). No resource is Device Verified.
-- Binary exports are untested on hardware. Device transfer remains unavailable:
-  the shared protocol key and a verified transfer flow are missing.
+- Binary exports and TamaLab uploads are untested on hardware. The upload flow and
+  key were identified in the user's Patchi Lab V1 installation; local simulated
+  transfer reconstructs 舞台.bin byte-for-byte. Device acceptance remains pending.
 - `舞台.bin` is a user-reported Patchi Lab V1 reference uploaded as a new item.
   Generating another new-item identity still requires evidence of its allocation fields.
 - Template rebuilding preserves the existing palette, which can change the artwork's
@@ -127,9 +132,26 @@ serial streams must never be reported as real-device verification.
 
 ## Next Tasks
 
-1. Obtain a verified shared protocol key/configuration and a known working user item template.
-2. Review and hardware-test a bounded custom-item transfer flow with recorded TX/RX.
-3. Record device acceptance before marking any generated resource Device Verified.
+1. Upload original 舞台.bin through TamaLab and capture TX/RX plus the device result.
+2. Record whether the item is added and existing items remain available.
+3. Separately test modified output before marking any generated resource Device Verified.
+
+## Upload an existing item
+
+1. Close Patchi Lab and other software holding the serial port.
+2. Open `/device`, choose USB serial and connect at 460800 baud.
+3. Under **Upload an existing item**, select the original `.bin` and import the
+   locally prepared `.local/patchi-protocol-key.json`. The key stays in memory for
+   this page session; it is excluded from Git and deployment. No key is bundled
+   in the app. Other users must supply their own protocol-key configuration.
+4. Start capture, put the Tamagotchi on the download connection screen used with
+   Patchi Lab, and choose **Upload item unchanged**.
+5. After all chunks are acknowledged, check the device result, stop capture and
+   export JSON. Cancellation or failure closes the connection; reconnect before retrying.
+
+This sends the file unchanged. It does not assign IDs or guarantee storage behavior
+on repeat upload. See [upload evidence and limits](docs/research/item-upload.md).
+Mock mode simulates acknowledgements only and never proves hardware acceptance.
 
 For offline exports, open `/studio`, import artwork, then use **Binary export**.
 Choose **Build sprite binary**, or import an item template, match its dimensions,

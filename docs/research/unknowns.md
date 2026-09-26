@@ -13,7 +13,8 @@
 
 Unknown fields cannot be filled using convenient guesses. Creating new item
 behavior still throws; existing behavior is preserved during template rebuilding.
-Encrypted transfer remains blocked on a verified shared protocol key and a
-hardware-tested flow. Plaintext ECHO cannot establish either prerequisite.
+Encrypted item upload is implemented from the documented protocol and local
+Patchi Lab V1 inspection, with a separately imported key. TamaLab's hardware
+acceptance remains untested. Plaintext ECHO does not establish item acceptance.
 Do not create synthetic binaries and call them known Paradise assets.
 AI and later editors wait for the Project.md review checkpoint.

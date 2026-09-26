@@ -10,9 +10,11 @@ Reference implementation to review later: [tamacom](https://github.com/GMMan/tam
 | Reply timeout                  | N/A            | N/A                     | milliseconds | N/A        | Bound diagnostic wait | 500                       | Adapter/OS timing variation                                       | Source above, Echo  | HIGH CONFIDENCE |
 | Resource packet implementation | UNKNOWN        | UNKNOWN                 | UNKNOWN      | UNKNOWN    | Custom item transfer  | None implemented          | Framing, payload, checksum, session rules remain unvalidated here | Research lead above | UNKNOWN         |
 
-This release implements a single echo attempt only. It sends no resource chunks.
-The documented protocol contains more than an echo; a separate review and fixture
-set is required before implementing those parts. Read chunks are not packets.
+This release implements a single echo attempt and a separate bounded type-3 item
+uploader. See [upload field ledger and evidence](item-upload.md). The earlier
+resource-packet UNKNOWN row above records the foundation's state; current framing,
+CRC and download session behavior are HIGH CONFIDENCE from documented sources and
+local reference inspection, with hardware acceptance still pending. Read chunks are not packets.
 The echo reader buffers split lines with a 1,024-character diagnostic limit.
 That limit is an application limit, not a claimed Paradise packet size.
 

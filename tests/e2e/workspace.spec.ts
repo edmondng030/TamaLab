@@ -1,5 +1,81 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+
+test("existing item upload, key gate, unchanged mock transfer and cancellation", async ({
+  page,
+}) => {
+  await page.goto("/device");
+  await page
+    .getByRole("button", { name: "Connect device", exact: true })
+    .click();
+  await page
+    .getByLabel("Item file (.bin)")
+    .setInputFiles("tests/fixtures/tamacat/pa-tomaquet.bin");
+  await expect(
+    page.getByRole("button", { name: "Simulate item upload" }),
+  ).toBeDisabled();
+  await page
+    .getByLabel("Local protocol key (.json)")
+    .setInputFiles({
+      name: "test-key.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify({ keyHex: "0102030405060708" })),
+    });
+  await page.getByRole("button", { name: "Start capture" }).click();
+  await page.getByRole("button", { name: "Simulate item upload" }).click();
+  await expect(page.getByRole("status")).toContainText("Mock upload completed");
+  await expect(
+    page.getByText("Acknowledged: 16,384 / 16,384 bytes"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Stop capture" }).click();
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "JSON", exact: true }).click();
+  const capture = JSON.parse(
+    await readFile((await (await pending).path())!, "utf8"),
+  ) as { direction: string; length: number; hex: string }[];
+  const tx = capture.filter((e) => e.direction === "TX");
+  expect(tx.map((e) => e.length)).toEqual([11, 4112, 4112, 4112, 4112]);
+  expect(tx[0].hex).toBe("50 4B 54 20 31 36 33 38 34 0D 0A");
+  await page.screenshot({
+    path: "test-results/item-upload.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "Forget protocol key" }).click();
+  await expect(
+    page.getByRole("button", { name: "Simulate item upload" }),
+  ).toBeDisabled();
+  await page
+    .getByLabel("Item file (.bin)")
+    .setInputFiles({
+      name: "bad.bin",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("bad"),
+    });
+  await expect(page.getByTestId("upload-file-message")).toContainText(
+    "truncated",
+  );
+  await page.getByRole("button", { name: "Disconnect", exact: true }).click();
+  await page.getByLabel("Simulated response").selectOption("timeout");
+  await page
+    .getByRole("button", { name: "Connect device", exact: true })
+    .click();
+  await page
+    .getByLabel("Item file (.bin)")
+    .setInputFiles("tests/fixtures/tamacat/pa-tomaquet.bin");
+  await page
+    .getByLabel("Local protocol key (.json)")
+    .setInputFiles({
+      name: "test-key.json",
+      mimeType: "application/json",
+      buffer: Buffer.from('{"keyHex":"0102"}'),
+    });
+  await page.getByRole("button", { name: "Simulate item upload" }).click();
+  await page.getByRole("button", { name: "Cancel upload" }).click();
+  await expect(page.getByRole("status")).toContainText("cancelled");
+  await expect(
+    page.getByRole("button", { name: "Connect device", exact: true }),
+  ).toBeEnabled();
+});
 test("mock console, capture, navigation, and timeout", async ({ page }) => {
   await page.goto("/device");
   await page.getByRole("button", { name: "Start capture" }).click();
@@ -129,13 +205,11 @@ test("experimental item build, decoded preview, export and stale output preventi
     ctx.fillRect(0, 0, 32, 32);
     return canvas.toDataURL().split(",")[1];
   });
-  await page
-    .getByLabel("Upload image")
-    .setInputFiles({
-      name: "red.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(base64, "base64"),
-    });
+  await page.getByLabel("Upload image").setInputFiles({
+    name: "red.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(base64, "base64"),
+  });
   await page.getByRole("button", { name: "Build sprite binary" }).click();
   await expect(
     page.getByRole("img", { name: "Decoded binary preview" }),
@@ -168,13 +242,11 @@ test("experimental item build, decoded preview, export and stale output preventi
   await page.getByLabel("Sprite width", { exact: true }).fill("16");
   await page.getByRole("button", { name: "Build item binary" }).click();
   await expect(page.getByTestId("binary-message")).toContainText("32 × 32");
-  await page
-    .getByLabel("Item template (.bin)")
-    .setInputFiles({
-      name: "bad.bin",
-      mimeType: "application/octet-stream",
-      buffer: Buffer.from("bad"),
-    });
+  await page.getByLabel("Item template (.bin)").setInputFiles({
+    name: "bad.bin",
+    mimeType: "application/octet-stream",
+    buffer: Buffer.from("bad"),
+  });
   await expect(
     page.getByRole("button", { name: "Build item binary" }),
   ).toHaveCount(0);

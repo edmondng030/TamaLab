@@ -1,5 +1,21 @@
 # Initial foundation validation
 
+## Existing-item upload milestone — 2026-09-26
+
+Regression baseline before protocol changes: all 30 existing unit tests passed.
+Final checks: lint, typecheck, production build, 50 unit tests and 5 Edge flows PASS.
+Added encrypted chunk, CRC known-answer, independent decrypt/payload, unchanged
+input, private-key parsing, split/duplicate ACK, NAK retry, ENQ bounds, timeout,
+collision, cancellation, disconnect and mutual-exclusion tests. A Node Buffer
+aliasing regression found during local verification was fixed by copying inputs
+before clearing the temporary key.
+
+Five Edge flows pass, including key gating, mock upload, capture download,
+invalid item rejection, forgetting the key and cancellation/reconnect state.
+Local simulation with the user's 舞台.bin and locally extracted key produced four
+chunks that independently decrypt to the exact original SHA-256. No actual device
+upload was performed. Key material and decompiled reference code stay out of Git.
+
 ## Offline encoding milestone — 2026-09-26
 
 - Lint, typecheck and production build: PASS.

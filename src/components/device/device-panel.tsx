@@ -16,6 +16,7 @@ import { useSettings } from "@/lib/storage/settings";
 import { decodeLog, exportLog, toAscii } from "@/lib/device/log";
 import { downloadBlob } from "@/lib/download";
 import type { MockBehavior } from "@/lib/transport/MockTransport";
+import { ItemUploadPanel } from "./item-upload-panel";
 
 export function DevicePanel() {
   const device = useDevice();
@@ -184,7 +185,7 @@ export function DevicePanel() {
               </div>
               <div>
                 <dt>Resource transfer</dt>
-                <dd>Not implemented</dd>
+                <dd>Existing item upload · experimental</dd>
               </div>
             </dl>
             <div role="status" className="status-message">
@@ -332,6 +333,7 @@ export function DevicePanel() {
           </div>
         </div>
       </section>
+      <ItemUploadPanel />
     </>
   );
 }

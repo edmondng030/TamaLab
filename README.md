@@ -4,7 +4,7 @@ A local sprite workspace and UART research lab for Tamagotchi Paradise.
 
 ## Current Version
 
-**v0.1.0 — initial foundation (Tasks 01–10).** This is not the completed device-transfer MVP.
+**Initial foundation plus experimental offline binary export.** This is not the completed device-transfer MVP.
 The app lives at this repository's root; source code uses `src/` consistently.
 
 ## Run locally
@@ -41,8 +41,11 @@ installation. The installed CLI works directly:
 - Name/category metadata, PNG export, and one explicit local draft in IndexedDB.
   Original, resized image, and sprite remain separate Blobs. Open draft restores it.
 - `/settings`: persisted Developer Mode. `/projects`: clearly labelled future scope.
-- Encoder interfaces that fail closed, a PCOM placeholder, research templates,
-  and synthetic protocol/transport/image tests.
+- Indexed RGB565 sprite binary encoding and decoded previews. Template-based ARC2
+  item rebuilding replaces one frame while retaining behavior, names, palette and
+  other frames. Exported binaries are experimental and not device verified.
+- A PCOM placeholder, pinned format research, a provenance-backed item test fixture,
+  and protocol/transport/image/binary tests.
 
 ## Working
 
@@ -64,7 +67,8 @@ React image workspace → image processing → device-independent quantization
                       → Canvas preview / PNG
                       → Dexie draft (original + processed + sprite Blobs)
 
-ParadiseEncoder<T> → UNKNOWN format error (no fabricated binary)
+React binary export → ParadiseService → sprite encoder / item template rebuilder
+                                      → decoded preview / local binary download
 ```
 
 `src/lib/paradise/` exclusively owns device-specific formats and commands.
@@ -75,15 +79,20 @@ The TX log records attempted writes, not proof that the device received bytes.
 ## Experimental
 
 UART defaults and the echo command are sourced from public research and are
-**HIGH CONFIDENCE**, not tested on this project's hardware. See
+**HIGH CONFIDENCE**, with user-supplied echo evidence recorded separately. See
 [UART research](docs/research/uart.md) and [protocol notes](docs/research/protocol.md).
 The one-shot echo waits 500 ms and does not retry automatically.
 
 ## Known Issues
 
 - One real-device ECHO connectivity test passed on 2026-09-26; see [hardware test log](docs/hardware-tests.md). No resource is Device Verified.
-- Paradise item/sprite encoding and resource transfer are unavailable. No generated
-  device binary can be exported; only the preview PNG and UART logs can be exported.
+- Binary exports are untested on hardware. Device transfer remains unavailable:
+  the shared protocol key and a verified transfer flow are missing.
+- Template rebuilding preserves the existing palette, which can change the artwork's
+  colors. It requires matching dimensions and binary alpha. Only indexed sprites
+  with uncompressed or bytewise RLE frames and one palette set can be edited.
+- Standalone binary sprites support 1–255 pixels per dimension; the editor's
+  256-pixel previews cannot be encoded. New item behavior cannot be generated.
 - PCOM transport behavior is UNKNOWN for the user's specific adapter.
 - Only one explicit local draft; no autosave, project library, or .tamaproject exchange.
 - Crop uses numeric source-pixel controls. Crop-to-output aspect ratio can stretch.
@@ -116,11 +125,15 @@ serial streams must never be reported as real-device verification.
 
 ## Next Tasks
 
-1. Review this architecture and UART foundation (the Project.md stop point).
-2. Export the raw TX/RX JSON from the successful ECHO test and record adapter/browser details.
-3. Pin upstream research revisions and acquire provenance-backed sprite/item fixtures.
-4. Implement the documented sprite encoder behind tests, without claiming item compatibility.
-5. Identify and validate the item container before enabling any device transfer.
+1. Obtain a verified shared protocol key/configuration and a known working user item template.
+2. Review and hardware-test a bounded custom-item transfer flow with recorded TX/RX.
+3. Record device acceptance before marking any generated resource Device Verified.
+
+For offline exports, open `/studio`, import artwork, then use **Binary export**.
+Choose **Build sprite binary**, or import an item template, match its dimensions,
+select a frame, and choose **Build item binary**. Inspect the decoded preview before
+choosing **Export binary**. This does not send anything to the device.
+See the [encoding contract](docs/research/encoding-milestone.md) for pinned sources.
 
 ## Research sources
 
@@ -131,6 +144,7 @@ serial streams must never be reported as real-device verification.
 - [Next.js setup](https://nextjs.org/docs/app/getting-started/installation)
 - [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual)
 
-Independent community project; no official artwork is bundled.
+Independent community project. The app bundles no official artwork. Tests include
+a community-authored fixture with [provenance and license](tests/fixtures/tamacat/PROVENANCE.md).
 
 # TamaLab

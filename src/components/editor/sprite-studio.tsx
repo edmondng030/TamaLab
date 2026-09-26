@@ -13,6 +13,7 @@ import { ImageCanvas } from "@/components/sprite/image-canvas";
 import { decodeImage, processImage, type Crop } from "@/lib/image/process";
 import { db } from "@/lib/storage/db";
 import { downloadBlob } from "@/lib/download";
+import { BinaryExport } from "./binary-export";
 
 export function SpriteStudio() {
   const [original, setOriginal] = useState<Blob>();
@@ -441,6 +442,7 @@ export function SpriteStudio() {
       <div className="studio-status" role="status">
         {busy ? "Working…" : message}
       </div>
+      <BinaryExport image={busy || processing ? undefined : result?.spriteImage} />
     </div>
   );
 }

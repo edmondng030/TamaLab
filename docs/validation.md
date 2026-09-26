@@ -1,5 +1,22 @@
 # Initial foundation validation
 
+## Offline encoding milestone — 2026-09-26
+
+- Lint, typecheck and production build: PASS.
+- Unit tests: PASS, 30 tests. Existing UART regressions remain unchanged.
+- Edge browser flows: PASS, 4 tests, including template import, decoded preview,
+  checksum-valid binary download, invalid template/dimension rejection, and stale
+  export removal after changing the selected frame.
+- Format tests use independent bit-order vectors and the pinned TamaCat fixture
+  with SHA-256 verification. Rebuilding checks unchanged behavior, names, palette,
+  unselected frame payloads, and the original input.
+- Tests also cover malformed lengths, checksum corruption, truncated data,
+  overlapping frame offsets, RLE bounds, partial alpha and unsupported formats.
+- No UART writes or generated-resource hardware tests were performed. All binary
+  output remains EXPERIMENTAL. A protocol key and validated transfer flow are missing.
+
+The following section records the earlier foundation validation.
+
 Date: 2026-09-25. Hardware: **NOT TESTED**.
 
 ## Required checks

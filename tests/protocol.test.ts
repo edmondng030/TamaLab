@@ -99,10 +99,10 @@ describe("documented echo diagnostic", () => {
 });
 describe("unverified features fail closed", () => {
   const sprite = { width: 1, height: 1, rgba: new Uint8ClampedArray(4) };
-  it("blocks sprite and item binary generation", async () => {
-    await expect(new ParadiseSpriteEncoder().encode(sprite)).rejects.toThrow(
-      "UNKNOWN",
-    );
+  it("allows offline sprites but blocks invented item behavior", async () => {
+    expect(
+      (await new ParadiseSpriteEncoder().encode(sprite)).length,
+    ).toBeGreaterThan(24);
     await expect(
       new ParadiseItemEncoder().encode({
         name: "Test",

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 test("mock console, capture, navigation, and timeout", async ({ page }) => {
   await page.goto("/device");
   await page.getByRole("button", { name: "Start capture" }).click();
@@ -54,13 +55,11 @@ test("image crop, palette, PNG export, and IndexedDB draft", async ({
     ctx.fillRect(20, 0, 8, 12);
     return canvas.toDataURL("image/png").split(",")[1];
   });
-  await page
-    .getByLabel("Upload image")
-    .setInputFiles({
-      name: "test-art.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(base64, "base64"),
-    });
+  await page.getByLabel("Upload image").setInputFiles({
+    name: "test-art.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(base64, "base64"),
+  });
   await expect(
     page.getByRole("img", { name: "Pixel sprite preview" }),
   ).toBeVisible();
@@ -116,4 +115,74 @@ test("developer settings gate the baud rate", async ({ page }) => {
   await page.getByLabel("Enable Developer Mode").check();
   await page.getByRole("link", { name: "Device lab", exact: true }).click();
   await expect(page.getByLabel("Baud rate", { exact: true })).toBeEnabled();
+});
+
+test("experimental item build, decoded preview, export and stale output prevention", async ({
+  page,
+}) => {
+  await page.goto("/studio");
+  const base64 = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 32;
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "red";
+    ctx.fillRect(0, 0, 32, 32);
+    return canvas.toDataURL().split(",")[1];
+  });
+  await page
+    .getByLabel("Upload image")
+    .setInputFiles({
+      name: "red.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(base64, "base64"),
+    });
+  await page.getByRole("button", { name: "Build sprite binary" }).click();
+  await expect(
+    page.getByRole("img", { name: "Decoded binary preview" }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Item template (.bin)")
+    .setInputFiles("tests/fixtures/tamacat/pa-tomaquet.bin");
+  await expect(page.getByRole("button", { name: "Export binary" })).toHaveCount(
+    0,
+  );
+  await page.getByLabel("Template frame").selectOption("1");
+  await page.getByRole("button", { name: "Build item binary" }).click();
+  await expect(page.getByTestId("binary-message")).toContainText(
+    "16,384 bytes",
+  );
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export binary" }).click();
+  const download = await pending;
+  expect(download.suggestedFilename()).toBe("tama-experimental.item.bin");
+  const bytes = await readFile((await download.path())!);
+  expect(bytes.length).toBe(16384);
+  expect(bytes.subarray(0, 4).toString()).toBe("ARC2");
+  expect(bytes.readUInt32LE(4)).toBe(
+    bytes.subarray(8).reduce((sum, b) => (sum + b) >>> 0, 0),
+  );
+  await page.getByLabel("Template frame").selectOption("2");
+  await expect(page.getByRole("button", { name: "Export binary" })).toHaveCount(
+    0,
+  );
+  await page.getByLabel("Sprite width", { exact: true }).fill("16");
+  await page.getByRole("button", { name: "Build item binary" }).click();
+  await expect(page.getByTestId("binary-message")).toContainText("32 × 32");
+  await page
+    .getByLabel("Item template (.bin)")
+    .setInputFiles({
+      name: "bad.bin",
+      mimeType: "application/octet-stream",
+      buffer: Buffer.from("bad"),
+    });
+  await expect(
+    page.getByRole("button", { name: "Build item binary" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Send to Tamagotchi" }),
+  ).toBeDisabled();
+  await page.screenshot({
+    path: "test-results/binary-export.png",
+    fullPage: true,
+  });
 });

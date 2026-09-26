@@ -30,7 +30,8 @@ which remain excluded. A checksum-valid archive does not prove item semantics.
 
 `舞台.bin` is present in the project workspace. SHA-256:
 `85e726a6acadb6972d502a6f95f42c0ca2d59dbc0b04d8a29234a09a5000db87`.
-The user reports that this exact file was successfully uploaded by Patchi Lab V1.
+The user reports that this exact file was successfully uploaded by Patchi Lab V1
+as a new item, while existing device items remained available.
 TamaLab parses it as a 16,384-byte ARC2 archive with three files and six indexed
 sprite entries (nine frames total). This is strong evidence that the container is
 accepted by at least the user's device/toolchain, but it does not identify the

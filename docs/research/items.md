@@ -44,6 +44,7 @@ lengths and checksums, and zero-fills unused archive space. Unselected frame
 payloads remain unchanged. No new category, price, name or behavior is synthesized.
 The 16,384-byte item limit is enforced; patch-sized output is excluded.
 
-`舞台.bin` is a user-reported accepted reference from Patchi Lab V1. It is kept
-as the original workspace file and is not treated as proof that rebuilt output
-will be accepted.
+`舞台.bin` is a user-reported reference that Patchi Lab V1 uploaded as a new
+item without replacing an existing item. Its identity and behavior fields are
+valuable evidence, but their individual meanings and allocation procedure remain
+UNKNOWN. Rebuilt output is not automatically equivalent.

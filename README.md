@@ -88,8 +88,8 @@ The one-shot echo waits 500 ms and does not retry automatically.
 - One real-device ECHO connectivity test passed on 2026-09-26; see [hardware test log](docs/hardware-tests.md). No resource is Device Verified.
 - Binary exports are untested on hardware. Device transfer remains unavailable:
   the shared protocol key and a verified transfer flow are missing.
-- `舞台.bin` is a user-reported Patchi Lab V1 accepted reference. TamaLab can
-  inspect and reskin it, but modified output still requires a separate hardware test.
+- `舞台.bin` is a user-reported Patchi Lab V1 reference uploaded as a new item.
+  Generating another new-item identity still requires evidence of its allocation fields.
 - Template rebuilding preserves the existing palette, which can change the artwork's
   colors. It requires matching dimensions and binary alpha. Only indexed sprites
   with uncompressed or bytewise RLE frames and one palette set can be edited.

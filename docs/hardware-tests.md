@@ -2,25 +2,26 @@
 
 ## Test 001 — ECHO connectivity
 
-| Field                              | Value                                                                                  |
-| ---------------------------------- | -------------------------------------------------------------------------------------- |
-| Date / time / timezone             | 2026-09-26 / time not captured / Asia/Hong_Kong                                        |
-| Adapter and interface              | USB Serial, Windows COM port shown as COM4 in chooser                                  |
-| Device variant / firmware          | UNKNOWN                                                                                |
-| OS                                 | Windows / exact version UNKNOWN                                                        |
-| Browser / version                  | Chromium-based browser / exact version UNKNOWN                                         |
-| Baud rate / framing / flow control | 460800 / 8-N-1 / none (application default)                                            |
-| Action                             | Connected in web app and sent documented ECHO test                                     |
-| TX (capture path)                  | ECHO REQ + CRLF expected; raw capture was not exported                                 |
-| RX (capture path)                  | ECHO REP observed by app; raw capture was not exported                                 |
-| Result                             | PASS — connectivity echo                                                               |
-| Device behaviour                   | App reported “Echo reply received”                                                     |
-| Notes                              | Confirms a responding serial connection only. Does not verify item or sprite transfer. |
+| Field                              | Value                                                                                                      |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Date / time / timezone             | 2026-09-26 / time not captured / Asia/Hong_Kong                                                            |
+| Adapter and interface              | USB Serial, Windows COM port shown as COM4 in chooser                                                      |
+| Device variant / firmware          | UNKNOWN                                                                                                    |
+| OS                                 | Windows / exact version UNKNOWN                                                                            |
+| Browser / version                  | Chromium-based browser / exact version UNKNOWN                                                             |
+| Baud rate / framing / flow control | 460800 / 8-N-1 / none (application default)                                                                |
+| Action                             | Connected in web app and sent documented ECHO test                                                         |
+| TX (capture path)                  | 10 × `45 43 48 4F 20 52 45 51 0D 0A` (`ECHO REQ\\r\\n`)                                                    |
+| RX (capture path)                  | 10 RX chunks; 9 complete `ECHO REP\\r\\n` replies and 1 reply split as `45` + `43 48 4F 20 52 45 50 0D 0A` |
+| Result                             | PASS — repeated connectivity echo                                                                          |
+| Device behaviour                   | 9 replies arrived within the app timeout; one TX at 08:35:52.575Z had no RX record                         |
+| Notes                              | Confirms a responding serial connection only. Does not verify item or sprite transfer.                     |
 
-Evidence: user-provided screenshot showing the app status “Echo reply received.
-This confirms a responding connection, not item compatibility.” Raw TX/RX bytes
-should be exported from the UART console in the next test. All other automated
-serial tests are synthetic.
+Evidence: `tama-capture-1790412323005.json`, supplied by the user, plus the
+user-provided screenshot showing “Echo reply received. This confirms a responding
+connection, not item compatibility.” Timestamps are UTC. The capture demonstrates
+that Web Serial can split one reply across multiple reads; the protocol parser
+reassembled it successfully. All other automated serial tests are synthetic.
 
 ## Test record template
 

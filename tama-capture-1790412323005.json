@@ -1,0 +1,122 @@
+[
+  {
+    "timestamp": "2026-09-26T08:31:51.932Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:52.023Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:54.165Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:54.258Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:54.728Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:54.808Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:55.410Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:55.491Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:55.988Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:31:56.075Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:32:56.295Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:32:56.317Z",
+    "direction": "RX",
+    "hex": "45",
+    "length": 1
+  },
+  {
+    "timestamp": "2026-09-26T08:32:56.318Z",
+    "direction": "RX",
+    "hex": "43 48 4F 20 52 45 50 0D 0A",
+    "length": 9
+  },
+  {
+    "timestamp": "2026-09-26T08:35:52.575Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:39:06.720Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:39:06.759Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:45:08.372Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:45:08.389Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:45:13.556Z",
+    "direction": "TX",
+    "hex": "45 43 48 4F 20 52 45 51 0D 0A",
+    "length": 10
+  },
+  {
+    "timestamp": "2026-09-26T08:45:13.581Z",
+    "direction": "RX",
+    "hex": "45 43 48 4F 20 52 45 50 0D 0A",
+    "length": 10
+  }
+]

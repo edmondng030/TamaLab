@@ -5,6 +5,25 @@ export interface Crop {
   width: number;
   height: number;
 }
+export type ImageFit = "contain" | "stretch";
+export function fittedRect(
+  sourceWidth: number,
+  sourceHeight: number,
+  width: number,
+  height: number,
+  fit: ImageFit,
+) {
+  if (fit === "stretch") return { x: 0, y: 0, width, height };
+  const scale = Math.min(width / sourceWidth, height / sourceHeight);
+  const w = Math.max(1, Math.round(sourceWidth * scale));
+  const h = Math.max(1, Math.round(sourceHeight * scale));
+  return {
+    x: Math.floor((width - w) / 2),
+    y: Math.floor((height - h) / 2),
+    width: w,
+    height: h,
+  };
+}
 export const ACCEPTED_IMAGES = ["image/png", "image/jpeg", "image/webp"];
 export function validateImage(file: Blob) {
   if (!ACCEPTED_IMAGES.includes(file.type))
@@ -62,6 +81,7 @@ export async function processImage(
   width: number,
   height: number,
   colors: number,
+  fit: ImageFit = "stretch",
 ) {
   validateSize(width);
   validateSize(height);
@@ -74,16 +94,17 @@ export async function processImage(
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Canvas 2D is unavailable in this browser.");
     context.imageSmoothingEnabled = false;
+    const rect = fittedRect(crop.width, crop.height, width, height, fit);
     context.drawImage(
       image,
       crop.x,
       crop.y,
       crop.width,
       crop.height,
-      0,
-      0,
-      width,
-      height,
+      rect.x,
+      rect.y,
+      rect.width,
+      rect.height,
     );
     const processedImage = await canvasBlob(canvas);
     const input = context.getImageData(0, 0, width, height);

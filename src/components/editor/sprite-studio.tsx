@@ -10,7 +10,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageCanvas } from "@/components/sprite/image-canvas";
-import { decodeImage, processImage, type Crop } from "@/lib/image/process";
+import {
+  decodeImage,
+  processImage,
+  type Crop,
+  type ImageFit,
+} from "@/lib/image/process";
 import { db } from "@/lib/storage/db";
 import { downloadBlob } from "@/lib/download";
 import { BinaryExport } from "./binary-export";
@@ -23,6 +28,7 @@ export function SpriteStudio() {
   const [width, setWidth] = useState(32);
   const [height, setHeight] = useState(32);
   const [colors, setColors] = useState(16);
+  const [fit, setFit] = useState<ImageFit>("contain");
   const [zoom, setZoom] = useState(8);
   const [result, setResult] =
     useState<Awaited<ReturnType<typeof processImage>>>();
@@ -49,6 +55,7 @@ export function SpriteStudio() {
       image.close();
       setOriginal(file);
       setFilename(file.name);
+      setName(file.name.replace(/\.[^.]+$/, ""));
       setResult(undefined);
       setMessage("Image imported. Adjust your crop and sprite settings below.");
     } catch (error) {
@@ -68,7 +75,7 @@ export function SpriteStudio() {
     const timer = setTimeout(() => {
       setProcessing(true);
       setResult(undefined);
-      void processImage(original, crop, width, height, colors)
+      void processImage(original, crop, width, height, colors, fit)
         .then((output) => {
           if (!cancelled) {
             setResult(output);
@@ -95,7 +102,7 @@ export function SpriteStudio() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [original, crop, width, height, colors]);
+  }, [original, crop, width, height, colors, fit]);
   async function saveDraft() {
     if (!original || !result) return;
     setBusy(true);
@@ -111,6 +118,7 @@ export function SpriteStudio() {
         width,
         height,
         colors,
+        fit,
         modifiedAt: new Date().toISOString(),
       });
       setMessage(
@@ -143,6 +151,7 @@ export function SpriteStudio() {
       setWidth(draft.width);
       setHeight(draft.height);
       setColors(draft.colors);
+      setFit(draft.fit ?? "stretch");
       setName(draft.name);
       setCategory(draft.category);
       setResult(undefined);
@@ -177,13 +186,16 @@ export function SpriteStudio() {
           <h1>
             Sprite workspace<span className="title-spark">✳</span>
           </h1>
-          <p>Give an everyday image a tiny new life.</p>
+          <p>
+            Turn your finished artwork into an item file for your Tamagotchi.
+          </p>
         </div>
-        <span className="badge amber">Preview Only</span>
+        <span className="badge amber">Image → Item .bin</span>
       </div>
       <div className="studio-toolbar">
         <span>
-          <Scan size={17} /> Image → Crop → Pixels
+          <Scan size={17} /> 1. Image → 2. Item template → 3. Convert → 4.
+          Upload
         </span>
         <div className="button-row compact">
           <Button
@@ -216,7 +228,7 @@ export function SpriteStudio() {
       </div>
       <div className="studio-grid">
         <section className="panel studio-assets">
-          <h2>Source image</h2>
+          <h2>01 · Your artwork</h2>
           <button
             className="upload-zone"
             disabled={busy}
@@ -337,30 +349,38 @@ export function SpriteStudio() {
           </div>
         </section>
         <section className="panel properties">
-          <h2>Make it yours</h2>
+          <h2>Image settings</h2>
           <label className="field">
-            Item name
+            Export name
             <input
+              aria-label="Item name"
               value={name}
               maxLength={80}
               disabled={busy}
               onChange={(e) => setName(e.target.value)}
             />
           </label>
-          <label className="field">
-            Category
-            <select
-              value={category}
-              disabled={busy}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="toy">Toy</option>
-              <option value="food">Food</option>
-              <option value="gift">Gift</option>
-              <option value="decoration">Decoration</option>
-              <option value="unknown">Unknown</option>
-            </select>
-          </label>
+          <p className="field-help">
+            Used for the downloaded filename. The template keeps its in-device
+            name and behavior.
+          </p>
+          <details>
+            <summary>Local draft category</summary>
+            <label className="field">
+              Category
+              <select
+                value={category}
+                disabled={busy}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="toy">Toy</option>
+                <option value="food">Food</option>
+                <option value="gift">Gift</option>
+                <option value="decoration">Decoration</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </label>
+          </details>
           <hr />
           <h3 className="section-label">SPRITE SIZE</h3>
           <div className="field-grid">
@@ -395,9 +415,23 @@ export function SpriteStudio() {
               />
             </label>
           </div>
+          <label className="field">
+            Image fit
+            <select
+              value={fit}
+              disabled={busy}
+              onChange={(e) => {
+                setResult(undefined);
+                setFit(e.target.value as ImageFit);
+              }}
+            >
+              <option value="contain">Fit inside · keep proportions</option>
+              <option value="stretch">Stretch to fill</option>
+            </select>
+          </label>
           <p className="field-help">
-            Crop is fitted to this size. Match its aspect ratio to avoid
-            stretching.
+            Selecting a template sprite below sets the required size
+            automatically.
           </p>
           <label className="field">
             Palette limit
@@ -429,20 +463,30 @@ export function SpriteStudio() {
             Median cut · {result?.palette.length ?? 0} colors used
           </p>
           <hr />
-          <span className="badge amber">Preview Only</span>
+          <span className="badge amber">Artwork preview</span>
           <p className="field-help">
-            Paradise sprite and item encoding are not verified. PNG export is
-            for your artwork.
+            Continue below to create a complete item .bin and inspect its actual
+            colors. The image alone does not contain item behavior.
           </p>
-          <Button variant="outline" disabled className="w-full">
-            Send to Tamagotchi
+          <Button variant="outline" asChild className="w-full">
+            <a href="#create-item">Create item .bin ↓</a>
           </Button>
         </section>
       </div>
       <div className="studio-status" role="status">
         {busy ? "Working…" : message}
       </div>
-      <BinaryExport image={busy || processing ? undefined : result?.spriteImage} />
+      <BinaryExport
+        image={busy || processing ? undefined : result?.spriteImage}
+        name={name}
+        onMatchSize={(nextWidth, nextHeight) => {
+          if (nextWidth !== width || nextHeight !== height) {
+            setResult(undefined);
+            setWidth(nextWidth);
+            setHeight(nextHeight);
+          }
+        }}
+      />
     </div>
   );
 }

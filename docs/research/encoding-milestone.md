@@ -41,7 +41,25 @@ accepted by at least the user's device/toolchain, but it does not identify the
 transfer encryption key, prove every field's semantics, or prove that a modified
 file will be accepted. The original file remains unmodified in the workspace.
 
-## Corrections
+## Image-to-item workflow — 2026-09-27
+
+This refinement adds editor preprocessing and an in-memory uploader handoff; it
+does not change the binary encoder, item identity fields, protocol or transport.
+Confidence in the format remains based on the pinned sources above. Hardware
+acceptance of newly converted artwork is UNKNOWN.
+
+The selected template frame determines output dimensions. Aspect-preserving fit
+is the default for new artwork. Partial alpha is normalized to 0/255 using a
+user-selected cutoff, or composited over white for opaque templates. The existing
+encoder maps artwork to the original palette. Other frames and item metadata
+remain unchanged. Export filenames are local metadata, not device item names.
+
+The decoded rebuilt frame supplies the conversion preview. Download and uploader
+handoff share one validated archive snapshot and SHA-256. Selecting it does not
+send anything; the existing uploader still requires explicit upload and a local
+key. No allocation of a new inventory identity is implemented or claimed.
+
+## Earlier corrections
 
 - Sprite headers are **24 bytes**, not the 20 bytes in the previous notes.
 - Capture 1790412323005 contains 10 requests and **9 replies total**, one of

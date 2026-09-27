@@ -7,12 +7,40 @@ import {
   ParadiseSpriteEncoder,
   type SpriteResource,
 } from "@/lib/paradise/sprite/encoder";
-import { decodeSprite, frameRgba } from "@/lib/paradise/sprite/decoder";
+import {
+  decodeSprite,
+  frameRgba,
+  type DecodedSprite,
+} from "@/lib/paradise/sprite/decoder";
 import {
   inspectItemTemplate,
   rebuildItemTemplate,
 } from "@/lib/paradise/item/template";
 export class ParadiseService {
+  static previewFrame(sprite: DecodedSprite, frame: number) {
+    return {
+      width: sprite.width,
+      height: sprite.height,
+      rgba: frameRgba(sprite, frame),
+    };
+  }
+  static async prepareUpload(
+    bytes: Uint8Array,
+    name: string,
+    origin: "studio" | "file",
+  ): Promise<PreparedUploadItem> {
+    const copy = new Uint8Array(bytes);
+    inspectItemTemplate(copy);
+    const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", copy));
+    return {
+      bytes: copy,
+      name,
+      origin,
+      hash: Array.from(digest, (byte) =>
+        byte.toString(16).padStart(2, "0"),
+      ).join(""),
+    };
+  }
   static parseProtocolKey = parseProtocolKey;
   static inspectItem = inspectItemTemplate;
   static async prepareSprite(resource: SpriteResource) {
@@ -77,4 +105,10 @@ export class ParadiseService {
     this.subscriptions.forEach((off) => off());
     await this.transport.disconnect();
   }
+}
+export interface PreparedUploadItem {
+  bytes: Uint8Array;
+  name: string;
+  hash: string;
+  origin: "studio" | "file";
 }

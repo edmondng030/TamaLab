@@ -4,8 +4,9 @@ A local sprite workspace and UART research lab for Tamagotchi Paradise.
 
 ## Current Version
 
-**Initial foundation, offline binary export, and experimental existing-item upload.**
-TamaLab's physical upload test remains pending.
+**Image-to-item workspace and existing-item upload.**
+PC UART item upload is working according to the user's 2026-09-27 report.
+Converted artwork still needs its own hardware test.
 The app lives at this repository's root; source code uses `src/` consistently.
 
 ## Run locally
@@ -42,12 +43,15 @@ installation. The installed CLI works directly:
 - `/studio`: PNG/JPG/WEBP import (10 MB max), drag/drop, clipboard paste within
   the workspace, source-pixel crop with outline, nearest-neighbor resizing,
   median-cut palettes (2/4/16/256), transparent canvas preview, and 1–16× zoom.
-- Name/category metadata, PNG export, and one explicit local draft in IndexedDB.
+- Export filename/local category, PNG export, and one explicit local draft in IndexedDB.
   Original, resized image, and sprite remain separate Blobs. Open draft restores it.
 - `/settings`: persisted Developer Mode. `/projects`: clearly labelled future scope.
 - Indexed RGB565 sprite binary encoding and decoded previews. Template-based ARC2
   item rebuilding replaces one frame while retaining behavior, names, palette and
   other frames. Exported binaries are experimental and not device verified.
+- Template sprite thumbnails, automatic matching dimensions, aspect-preserving
+  image fit, transparency conversion, and original/converted frame comparison.
+  **Use in uploader** selects the exact converted archive without sending it.
 - A PCOM placeholder, pinned format research, a provenance-backed item test fixture,
   and protocol/transport/image/binary tests.
 
@@ -90,9 +94,9 @@ The one-shot echo waits 500 ms and does not retry automatically.
 ## Known Issues
 
 - One real-device ECHO connectivity test passed on 2026-09-26; see [hardware test log](docs/hardware-tests.md). No resource is Device Verified.
-- Binary exports and TamaLab uploads are untested on hardware. The upload flow and
-  key were identified in the user's Patchi Lab V1 installation; local simulated
-  transfer reconstructs 舞台.bin byte-for-byte. Device acceptance remains pending.
+- PC UART uploads have user-reported success. Generated artwork is untested on
+  hardware. The upload flow and key were identified in the user's Patchi Lab V1
+  installation; local simulated transfer reconstructs 舞台.bin byte-for-byte.
 - `舞台.bin` is a user-reported Patchi Lab V1 reference uploaded as a new item.
   Generating another new-item identity still requires evidence of its allocation fields.
 - Template rebuilding preserves the existing palette, which can change the artwork's
@@ -102,7 +106,8 @@ The one-shot echo waits 500 ms and does not retry automatically.
   256-pixel previews cannot be encoded. New item behavior cannot be generated.
 - PCOM transport behavior is UNKNOWN for the user's specific adapter.
 - Only one explicit local draft; no autosave, project library, or .tamaproject exchange.
-- Crop uses numeric source-pixel controls. Crop-to-output aspect ratio can stretch.
+- Crop uses numeric source-pixel controls. Fit inside preserves proportions;
+  Stretch fills the selected dimensions. Older drafts retain their stretch setting.
 - Original images above 24 megapixels are rejected after browser decoding to limit
   canvas allocation; large compressed images may still stress browser decoding.
 - Browser storage can be cleared/evicted. Export artwork separately for retention.
@@ -126,13 +131,14 @@ IndexedDB restoration, and settings. Hardware stream tests use synthetic streams
 
 ## Hardware Tests
 
-One ECHO connectivity test is recorded as PASS. Resource transfer remains NOT
-RUN. See [hardware test log](docs/hardware-tests.md). Browser tests and simulated
+One ECHO connectivity test is recorded as PASS, and PC UART item upload has a
+user-reported PASS. Converted artwork remains NOT RUN. See
+[hardware test log](docs/hardware-tests.md). Browser tests and simulated
 serial streams must never be reported as real-device verification.
 
 ## Next Tasks
 
-1. Upload original 舞台.bin through TamaLab and capture TX/RX plus the device result.
+1. Capture TX/RX and the device result for a converted item through TamaLab.
 2. Record whether the item is added and existing items remain available.
 3. Separately test modified output before marking any generated resource Device Verified.
 
@@ -153,10 +159,25 @@ This sends the file unchanged. It does not assign IDs or guarantee storage behav
 on repeat upload. See [upload evidence and limits](docs/research/item-upload.md).
 Mock mode simulates acknowledgements only and never proves hardware acceptance.
 
-For offline exports, open `/studio`, import artwork, then use **Binary export**.
-Choose **Build sprite binary**, or import an item template, match its dimensions,
-select a frame, and choose **Build item binary**. Inspect the decoded preview before
-choosing **Export binary**. This does not send anything to the device.
+## Convert your artwork into an item
+
+1. Open `/studio` and upload your PNG/JPG/WEBP. The original image is preserved.
+2. Under **Create item .bin**, select a working item `.bin` as the template.
+   Choose a sprite and frame; image dimensions match automatically. Fit inside
+   preserves proportions, while Stretch fills the frame.
+3. Choose **Convert image to item .bin** and inspect the converted preview.
+   Colors map to the template palette; partial transparency becomes either
+   transparent or opaque, or composites over white for opaque templates.
+4. **Download item .bin** saves a copy. **Use in uploader** opens `/device` with
+   the exact converted file selected. Connect USB serial, import your local key,
+   and explicitly choose **Upload item unchanged** when ready.
+
+The template supplies item structure and behavior. Only the selected frame changes;
+identity, in-device name, palette, behavior and other frames stay the same. Uploading
+may replace a download with that identity. This does not allocate a separate new
+item ID. Changing the export filename does not change the device's item name.
+The selected file stays in browser memory across navigation, but not a refresh.
+Standalone sprite export remains under **Advanced** and is not a complete item.
 See the [encoding contract](docs/research/encoding-milestone.md) for pinned sources.
 
 ## Research sources

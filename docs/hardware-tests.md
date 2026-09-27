@@ -1,6 +1,20 @@
 # Hardware tests
 
+## Test 002 — PC UART item upload (user report)
+
+Reported 2026-09-27, Asia/Hong_Kong. The user reports that uploading items through
+TamaLab via PC UART is working. Result: **PASS, user reported**. Exact uploaded
+filenames, browser version, device variant, on-device inventory behavior and a
+transfer capture were not supplied with this report. This confirms the reported
+PC upload workflow only; it does not verify all generated items or PhoneCom.
+Earlier NOT RUN entries below describe the state before this user test.
+
+The 2026-09-27 image-to-item workspace produces template-based artwork changes.
+Physical acceptance of those generated files remains **NOT RUN**. Automated
+browser tests can establish exact-byte handoff and simulated transfer only.
+
 ## Test 001 — ECHO connectivity
+
 
 | Field                              | Value                                                                                                      |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- |

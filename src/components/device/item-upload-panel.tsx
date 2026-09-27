@@ -3,23 +3,23 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ParadiseService } from "@/lib/device/ParadiseService";
 import { useDevice } from "@/lib/device/store";
+import { useUploadItem } from "@/lib/device/upload-item-store";
+import { downloadBlob } from "@/lib/download";
 
 export function ItemUploadPanel() {
   const device = useDevice();
-  const [item, setItem] = useState<{
-    bytes: Uint8Array;
-    name: string;
-    hash: string;
-  }>();
+  const { item, select: selectItem, clear: clearItem } = useUploadItem();
   const [key, setKey] = useState<Uint8Array>();
   const [message, setMessage] = useState(
-    "Choose an existing item file to send unchanged.",
+    item?.origin === "studio"
+      ? "Your converted item is selected. Import the protocol key and connect when you are ready to upload."
+      : "Choose an existing item file to send unchanged.",
   );
   const [loading, setLoading] = useState(false);
   const version = useRef(0);
   async function loadItem(file: File) {
     const current = ++version.current;
-    setItem(undefined);
+    clearItem();
     setLoading(true);
     try {
       if (file.size > 16384)
@@ -27,18 +27,13 @@ export function ItemUploadPanel() {
           "Choose an item of at most 16,384 bytes. Patch files are not supported.",
         );
       const bytes = new Uint8Array(await file.arrayBuffer());
-      ParadiseService.inspectItem(bytes);
-      const digest = new Uint8Array(
-        await crypto.subtle.digest("SHA-256", bytes),
+      const prepared = await ParadiseService.prepareUpload(
+        bytes,
+        file.name,
+        "file",
       );
       if (version.current !== current) return;
-      setItem({
-        bytes,
-        name: file.name,
-        hash: Array.from(digest, (b) => b.toString(16).padStart(2, "0")).join(
-          "",
-        ),
-      });
+      selectItem(prepared);
       setMessage(
         "Item archive validated. Original file bytes will be sent without edits.",
       );
@@ -74,6 +69,7 @@ export function ItemUploadPanel() {
       className="panel"
       style={{ marginTop: 24, marginBottom: 24 }}
       aria-label="Existing item upload"
+      id="item-upload"
     >
       <div className="panel-heading">
         <h2>Upload an existing item</h2>
@@ -136,6 +132,44 @@ export function ItemUploadPanel() {
           <small>SHA-256: {item.hash}</small>
         </p>
       )}
+      {item?.origin === "studio" && (
+        <div className="item-ready">
+          <strong>Converted in Sprite workspace · Experimental</strong>
+          <p>
+            The template identity, behavior and other frames are retained. This
+            file is not hardware verified and may replace a download with the
+            same identity.
+          </p>
+          <Button
+            variant="outline"
+            disabled={locked}
+            onClick={() =>
+              downloadBlob(
+                new Blob([new Uint8Array(item.bytes)], {
+                  type: "application/octet-stream",
+                }),
+                item.name,
+              )
+            }
+          >
+            Download selected item .bin
+          </Button>
+        </div>
+      )}
+      {item && (
+        <Button
+          variant="ghost"
+          disabled={locked}
+          onClick={() => {
+            clearItem();
+            setMessage(
+              "Item selection cleared. Choose another .bin to upload.",
+            );
+          }}
+        >
+          Clear selected item
+        </Button>
+      )}
       <p data-testid="upload-file-message" aria-live="polite">
         {message}
       </p>
@@ -177,7 +211,8 @@ export function ItemUploadPanel() {
       <p className="field-help">
         Start capture above before sending to keep a TX/RX record.
         Acknowledgement alone does not verify that the item appears on the
-        device. TamaLab hardware upload testing is pending.
+        device. PC UART uploads have been reported working; converted artwork
+        still needs its own device test.
       </p>
     </section>
   );

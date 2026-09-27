@@ -1,5 +1,5 @@
 import Dexie, { type Table } from "dexie";
-import type { Crop } from "@/lib/image/process";
+import type { Crop, ImageFit } from "@/lib/image/process";
 export interface SpriteDraft {
   id: "current";
   name: string;
@@ -12,6 +12,7 @@ export interface SpriteDraft {
   width: number;
   height: number;
   colors: number;
+  fit?: ImageFit;
   modifiedAt: string;
 }
 class StudioDatabase extends Dexie {

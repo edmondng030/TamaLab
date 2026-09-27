@@ -1,5 +1,21 @@
 # Initial foundation validation
 
+## Image-to-item workspace — 2026-09-27
+
+Lint, typecheck, production build, 55 unit tests and 6 Edge browser flows PASS.
+The workspace screenshot was reviewed. Tests cover proportional sizing,
+automatic template dimensions, alpha normalization without source mutation,
+opaque compositing, filenames, validated snapshot copies and stale output removal.
+
+The full browser flow imports synthetic artwork, rebuilds the provenance-backed
+fixture, checks decoded transparency, downloads the archive, and navigates to
+the uploader. Its filename, SHA-256 and downloaded bytes match. No upload starts
+on navigation. A subsequent explicit mock upload is captured and independently
+decrypted; reconstructed payload bytes equal the exported archive exactly.
+Existing upload, cancellation, echo, crop, draft and settings regressions pass.
+Protocol and transport implementations are unchanged. No generated artwork was
+uploaded to physical hardware; that acceptance remains UNKNOWN.
+
 ## Existing-item upload milestone — 2026-09-26
 
 Regression baseline before protocol changes: all 30 existing unit tests passed.
